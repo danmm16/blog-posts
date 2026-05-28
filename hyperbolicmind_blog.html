@@ -250,31 +250,19 @@
   </p>
 
   <div class="disk-diagram">
-    <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="diskGrad" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#e8f4f8"/>
-          <stop offset="60%" stop-color="#b8d4e8"/>
-          <stop offset="100%" stop-color="#2d4a6e"/>
-        </radialGradient>
-      </defs>
-      <circle cx="160" cy="160" r="148" fill="url(#diskGrad)" stroke="#0d1b2a" stroke-width="2"/>
-      <!-- rings -->
-      <circle cx="160" cy="160" r="30"  fill="none" stroke="#fff" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.6"/>
-      <circle cx="160" cy="160" r="60"  fill="none" stroke="#fff" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
-      <circle cx="160" cy="160" r="90"  fill="none" stroke="#fff" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.4"/>
-      <circle cx="160" cy="160" r="118" fill="none" stroke="#fff" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.3"/>
-      <circle cx="160" cy="160" r="135" fill="none" stroke="#fff" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.2"/>
-      <!-- center dot -->
-      <circle cx="160" cy="160" r="5" fill="#fff" opacity="0.9"/>
-      <!-- labels -->
-      <text x="160" y="156" text-anchor="middle" font-size="9" fill="#fff" font-family="Georgia" opacity="0.9">neutral</text>
-      <text x="160" y="38" text-anchor="middle" font-size="9" fill="#fff" font-family="Georgia" opacity="0.7">extremity &rarr; &infin;</text>
-      <text x="160" y="310" text-anchor="middle" font-size="9" fill="#fff" font-family="Georgia" opacity="0.5">boundary at &infin; hyperbolic distance</text>
-    </svg>
-    <p style="font-size:13px;color:#888;margin-top:8px;font-family:'Courier New',monospace;">Poincar&eacute; disk: neutral center, emotionally extreme boundary</p>
-  </div>
-
+  <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="160" cy="160" r="148" fill="#dce8f4" stroke="#1b2838" stroke-width="1.5"/>
+    <circle cx="160" cy="160" r="118" fill="#c8d8ec" stroke="#fff" stroke-width="0.8" stroke-dasharray="4,3"/>
+    <circle cx="160" cy="160" r="88"  fill="#b0c8e4" stroke="#fff" stroke-width="0.8" stroke-dasharray="4,3"/>
+    <circle cx="160" cy="160" r="60"  fill="#94b4d8" stroke="#fff" stroke-width="0.8" stroke-dasharray="4,3"/>
+    <circle cx="160" cy="160" r="34"  fill="#7aa0cc" stroke="#fff" stroke-width="0.8" stroke-dasharray="4,3"/>
+    <circle cx="160" cy="160" r="5"   fill="#fff"/>
+    <text x="160" y="163" text-anchor="middle" font-size="10" fill="#1b2838" font-family="Georgia">neutral</text>
+    <text x="160" y="44"  text-anchor="middle" font-size="10" fill="#1b2838" font-family="Georgia">extremity &#x2192; &#x221e;</text>
+    <text x="160" y="300" text-anchor="middle" font-size="9"  fill="#2d4a6e" font-family="Georgia">boundary at &#x221e; hyperbolic distance</text>
+  </svg>
+  <p style="font-size:13px;color:#888;margin-top:8px;font-family:'Courier New',monospace;">Poincar&eacute; disk: neutral center, emotionally extreme boundary</p>
+</div>
   <p>
     The visual representation compresses the outer rings to make room for the richly textured interior. This is not a distortion &mdash; it is an honest representation of how hyperbolic distance works. The inner rings are wide because they contain a lot of accessible emotional territory. The outer rings compress toward the boundary because the territory there, though vast, is further away in every sense that matters.
   </p>
