@@ -3,34 +3,220 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daniel Margolis — Blog</title>
+  <title>Daniel Margolis — Writing</title>
   <style>
-    body { font-family: Georgia, serif; max-width: 680px; margin: 60px auto; padding: 0 24px; color: #1a1a1a; }
-    h1 { font-weight: normal; font-size: 28px; margin-bottom: 8px; }
-    p { color: #666; margin-bottom: 40px; }
-    a.post { display: block; margin-bottom: 28px; text-decoration: none; }
-    a.post h2 { font-size: 20px; font-weight: normal; color: #1a2e48; margin: 0 0 4px; }
-    a.post span { font-size: 14px; color: #888; }
-    a.post:hover h2 { text-decoration: underline; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #1a1a1a;
+      background: #fafaf8;
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 64px 24px 96px;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding-bottom: 2rem;
+      border-bottom: 1px solid #e4e4dc;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero h1 {
+      font-size: 26px;
+      font-weight: normal;
+      letter-spacing: -0.01em;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      font-size: 15px;
+      color: #666;
+      max-width: 520px;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      font-weight: normal;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 14px;
+    }
+
+    /* ── Post card ── */
+    .post-card {
+      display: block;
+      background: #fff;
+      border: 1px solid #e4e4dc;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 12px;
+      text-decoration: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .post-card:hover {
+      border-color: #bbb;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .tag {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+      font-weight: normal;
+    }
+
+    .tag.blue  { background: #e6f1fb; color: #0c447c; }
+    .tag.green { background: #e1f5ee; color: #085041; }
+    .tag.purple{ background: #eeedfe; color: #3c3489; }
+
+    .post-card h2 {
+      font-size: 18px;
+      font-weight: normal;
+      letter-spacing: -0.01em;
+      color: #1a1a1a;
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+
+    .post-card p {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    .post-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .post-meta {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .post-arrow {
+      font-size: 18px;
+      color: #bbb;
+      transition: transform 0.15s, color 0.15s;
+    }
+
+    .post-card:hover .post-arrow {
+      transform: translateX(3px);
+      color: #888;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: #e4e4dc;
+      margin: 2rem 0;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid #e4e4dc;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: #bbb;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .footer a { color: #999; text-decoration: none; }
+    .footer a:hover { color: #555; }
   </style>
 </head>
 <body>
-  <h1>Daniel Margolis — Writing</h1>
-  <p>Research notes and technical posts.</p>
+<div class="page">
 
-  <a class="post" href="beyond_gae_blog.html">
+  <div class="hero">
+    <h1>Daniel Margolis &mdash; Writing</h1>
+    <p>Research notes on machine learning, numerical methods, and the mathematics of emotional systems.</p>
+  </div>
+
+  <p class="section-label">Research &amp; Technical</p>
+
+  <a class="post-card" href="beyond_gae_blog.html">
+    <div class="tag-row">
+      <span class="tag blue">Reinforcement Learning</span>
+      <span class="tag green">Numerical Methods</span>
+    </div>
     <h2>Beyond GAE: Higher-Order Advantage Estimation with Sobolev Regularization</h2>
-    <span>Reinforcement Learning &bull; Numerical Methods &bull; 2026</span>
+    <p>GAE is first-order numerical integration. This post describes what happens when you replace it with an exponentially-fitted quadrature rule, what goes catastrophically wrong without regularization, and why a penalty from PDE theory makes it work.</p>
+    <div class="post-footer">
+      <span class="post-meta">2026 &bull; quadrature-advantage</span>
+      <span class="post-arrow">&#8594;</span>
+    </div>
   </a>
 
-  <a class="post" href="emotivemind_blog.html">
+  <div class="divider"></div>
+
+  <p class="section-label">Emotional Economy</p>
+
+  <a class="post-card" href="emotivemind_blog.html">
+    <div class="tag-row">
+      <span class="tag purple">Macro</span>
+      <span class="tag purple">Agent Simulation</span>
+    </div>
     <h2>EmotiveMind: The Macro-Economy of Emotion</h2>
-    <span>Emotional Economy &bull; 2026</span>
+    <p>On quantifying feeling through palindromic integers &mdash; hate&nbsp;=&nbsp;131, neutrality&nbsp;=&nbsp;381, love&nbsp;=&nbsp;767 &mdash; and what happens when 500 emotional agents share a world. The macro view of the Emotional Economy.</p>
+    <div class="post-footer">
+      <span class="post-meta">2026 &bull; Emotional-Economy-Micro-and-Macro</span>
+      <span class="post-arrow">&#8594;</span>
+    </div>
   </a>
 
-  <a class="post" href="hyperbolicmind_blog.html">
+  <a class="post-card" href="hyperbolicmind_blog.html">
+    <div class="tag-row">
+      <span class="tag purple">Micro</span>
+      <span class="tag green">Hyperbolic Geometry</span>
+    </div>
     <h2>HyperbolicMind: The Micro-Economy of Emotion</h2>
-    <span>Emotional Economy &bull; 2026</span>
+    <p>A single mind modeled as a Poincar&eacute; disk cellular automaton, where the boundary is at infinite hyperbolic distance and extreme emotional states are always reachable but never fully reached. The micro view of the Emotional Economy.</p>
+    <div class="post-footer">
+      <span class="post-meta">2026 &bull; Emotional-Economy-Micro-and-Macro</span>
+      <span class="post-arrow">&#8594;</span>
+    </div>
   </a>
+
+  <div class="footer">
+    <span>Daniel Margolis &bull; SMU Applied &amp; Computational Mathematics &bull; 2026</span>
+    <span>
+      <a href="https://github.com/danmm16" target="_blank">GitHub</a>
+      &nbsp;&bull;&nbsp;
+      <a href="https://dmargolis.mobirisesite.com" target="_blank">Website</a>
+    </span>
+  </div>
+
+</div>
 </body>
 </html>
