@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beyond GAE: Higher-Order Advantage Estimation with Sobolev Regularization | Daniel Margolis</title>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 18px;
+      line-height: 1.8;
+      color: #1a1a1a;
+      background: #fafaf8;
+    }
+
+    /* ── Hero ────────────────────────────────────────────────── */
+    .post-hero {
+      background: linear-gradient(135deg, #0b1929 0%, #1a2e48 55%, #243d5c 100%);
+      color: #dce8f4;
+      padding: 80px 24px 64px;
+      text-align: center;
+    }
+
+    .post-hero .tag {
+      display: inline-block;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #f0c040;
+      margin-bottom: 20px;
+      border: 1px solid rgba(240,192,64,0.4);
+      padding: 4px 12px;
+      border-radius: 2px;
+    }
+
+    .post-hero h1 {
+      font-size: clamp(26px, 4.5vw, 46px);
+      font-weight: normal;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      max-width: 760px;
+      margin: 0 auto 20px;
+    }
+
+    .post-hero .subtitle {
+      font-size: 17px;
+      color: #9ab8d4;
+      max-width: 600px;
+      margin: 0 auto;
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    /* ── Meta bar ────────────────────────────────────────────── */
+    .post-meta {
+      background: #fff;
+      border-bottom: 1px solid #e4e4dc;
+      padding: 16px 24px;
+      text-align: center;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: #888;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Body ─────────────────────────────────────────────────── */
+    .post-body {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 64px 24px 96px;
+    }
+
+    .post-body p { margin-bottom: 1.5em; }
+
+    .post-body h2 {
+      font-size: 23px;
+      font-weight: normal;
+      color: #0b1929;
+      margin: 2.8em 0 0.8em;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f0c040;
+      letter-spacing: -0.01em;
+    }
+
+    .post-body h3 {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1a2e48;
+      margin: 2em 0 0.5em;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #e4e4dc;
+      margin: 2.5em 0;
+    }
+
+    /* ── Pull quotes ──────────────────────────────────────────── */
+    .pull-quote {
+      border-left: 4px solid #f0c040;
+      padding: 14px 22px;
+      margin: 2em 0;
+      background: #fffbf0;
+      font-style: italic;
+      color: #2a2010;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    /* ── Warning / result callout ─────────────────────────────── */
+    .callout {
+      border-left: 4px solid #c0392b;
+      background: #fdf4f3;
+      padding: 14px 22px;
+      margin: 2em 0;
+      font-size: 16px;
+      color: #2a0a08;
+    }
+
+    .callout.success {
+      border-left-color: #1a6b3c;
+      background: #f3fdf6;
+      color: #082a14;
+    }
+
+    /* ── Equation display ─────────────────────────────────────── */
+    .eq-block {
+      overflow-x: auto;
+      padding: 4px 0;
+      margin: 1.2em 0;
+    }
+
+    /* ── Code block ───────────────────────────────────────────── */
+    .code-block {
+      background: #0f1c2d;
+      color: #c8d8e8;
+      border-radius: 8px;
+      padding: 22px 26px;
+      margin: 1.8em 0;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.65;
+      overflow-x: auto;
+    }
+
+    .code-block .comment { color: #6a8fa8; }
+    .code-block .keyword { color: #f0c040; }
+    .code-block .string  { color: #7ec8a0; }
+
+    /* ── Tables ───────────────────────────────────────────────── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.8em 0;
+      font-size: 15px;
+    }
+
+    .data-table thead th {
+      background: #1a2e48;
+      color: #dce8f4;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: normal;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+    }
+
+    .data-table tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #e4e4dc;
+      vertical-align: middle;
+    }
+
+    .data-table tbody tr:nth-child(even) td { background: #f6f7f8; }
+
+    .data-table .best { color: #1a6b3c; font-weight: bold; }
+    .data-table .worst { color: #8b1a1a; }
+    .data-table .highlight td { background: #fffbf0 !important; }
+
+    /* ── Benchmark cards ──────────────────────────────────────── */
+    .env-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 1.8em 0;
+    }
+
+    .env-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .env-card h4 {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: #1a2e48;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .env-card .verdict {
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .env-card .verdict.good { color: #1a6b3c; }
+    .env-card .verdict.bad  { color: #8b1a1a; }
+    .env-card .verdict.neutral { color: #666; }
+
+    .env-card p {
+      font-size: 14px;
+      color: #444;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* ── Repo link ────────────────────────────────────────────── */
+    .repo-link {
+      display: inline-block;
+      background: #1a2e48;
+      color: #f0c040;
+      text-decoration: none;
+      padding: 12px 26px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      margin-top: 1em;
+      letter-spacing: 0.04em;
+      transition: background 0.2s;
+    }
+
+    .repo-link:hover { background: #0b1929; }
+
+    /* ── Footer note ──────────────────────────────────────────── */
+    .footnote {
+      margin-top: 3em;
+      padding-top: 2em;
+      border-top: 1px solid #e4e4dc;
+      font-size: 14px;
+      color: #777;
+      font-style: italic;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 540px) {
+      .env-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Hero ──────────────────────────────────────────────────── -->
+<div class="post-hero">
+  <span class="tag">Reinforcement Learning &bull; Numerical Methods</span>
+  <h1>Beyond GAE: Higher-Order Advantage Estimation with Sobolev Regularization</h1>
+  <p class="subtitle">What happens when you replace a first-order numerical integration scheme with something better, what goes wrong when you do it naively, and why a penalty from PDE-constrained optimization is the key ingredient that makes it work</p>
+</div>
+
+<div class="post-meta">
+  Daniel Margolis &nbsp;&bull;&nbsp; SMU Applied &amp; Computational Mathematics &nbsp;&bull;&nbsp; 2026
+  &nbsp;&bull;&nbsp; <a href="https://github.com/danmm16/quadrature-advantage" style="color:#aaa;">github.com/danmm16/quadrature-advantage</a>
+</div>
+
+<!-- ── Body ───────────────────────────────────────────────────── -->
+<div class="post-body">
+
+  <p>
+    Generalized Advantage Estimation is one of the most widely used techniques in deep RL. It works well. But it is also, in a precise mathematical sense, a first-order numerical integration scheme -- and first-order means it leaves accuracy on the table. This post describes what happens when you replace it with something better, what goes wrong when you do it naively, and why a penalty borrowed from PDE-constrained optimization turns out to be the key ingredient that makes it work.
+  </p>
+
+  <!-- ── Section 1 ────────────────────────────────────────────── -->
+  <h2>The Problem with GAE</h2>
+
+  <p>
+    PPO and most policy gradient algorithms depend on accurate advantage estimates to tell the agent which actions were genuinely better than expected. GAE computes these estimates as an exponentially-weighted sum of TD residuals:
+  </p>
+
+  <div class="eq-block">
+    $$A_t = \sum_{k=0}^{\infty} (\gamma\lambda)^k \delta_{t+k}, \qquad \delta_t = r_t + \gamma V(s_{t+1}) - V(s_t)$$
+  </div>
+
+  <p>
+    This formula has a clean numerical interpretation. The discounted advantage is really a continuous integral:
+  </p>
+
+  <div class="eq-block">
+    $$A = \int_0^\infty e^{-\alpha t}\, \delta(t)\, dt, \qquad \alpha = -\log(\gamma\lambda)$$
+  </div>
+
+  <p>
+    and GAE approximates it by summing $\delta_t$ with geometrically decaying weights. That is forward-Euler integration -- the simplest possible numerical quadrature scheme, accurate to first order in the step size.
+  </p>
+
+  <p>
+    How much error does this introduce? On a cubic TD residual function with $\gamma = 0.99$, $\lambda = 0.95$, GAE's truncated estimate is off by <strong>0.966</strong> relative to the true integral over a 7-step window. That is nearly a 100% relative error on a smooth, well-behaved function. The quadrature formulation described below makes the same estimate with error <strong>7.8 &times; 10<sup>&minus;8</sup></strong> -- essentially floating-point precision.
+  </p>
+
+  <!-- ── Section 2 ────────────────────────────────────────────── -->
+  <h2>A Better Approximation: Exponentially-Fitted Quadrature</h2>
+
+  <p>
+    The fix is to find weights $w_0, \dots, w_{H-1}$ that make the finite-window estimate exact for any TD residual function that is a polynomial of degree $H-1$ or lower:
+  </p>
+
+  <div class="eq-block">
+    $$\hat{A} = \sum_{k=0}^{H-1} w_k\, \delta_k \approx \int_0^{H-1} e^{-\alpha t}\, \delta(t)\, dt$$
+  </div>
+
+  <p>
+    For a 7-node stencil this gives $O(h^7)$ accuracy -- exact for any polynomial up to degree 6. The weights are computed by integrating the Lagrange basis functions against the exponential kernel:
+  </p>
+
+  <div class="eq-block">
+    $$w_k = \int_0^{H-1} L_k(t)\, e^{-\alpha t}\, dt = \frac{1}{d_k} \sum_{j=0}^{H-1} c_j^{(k)}\, M_j(\alpha)$$
+  </div>
+
+  <p>
+    where $c_j^{(k)}$ are the coefficients of the $k$-th Lagrange basis polynomial (computed exactly in integer arithmetic), $d_k$ is the exact integer denominator, and $M_j(\alpha) = \int_0^{H-1} t^j e^{-\alpha t}\, dt$ are the moments of the exponential kernel.
+  </p>
+
+  <p>
+    The moments satisfy a recurrence from integration by parts, but that recurrence suffers catastrophic cancellation when $\alpha$ is small -- which is most of the time in RL, since $\gamma\lambda \approx 0.94$ means $\alpha \approx 0.06$. The fix is a Taylor series expansion that converges in roughly 10 terms with no cancellation:
+  </p>
+
+  <div class="eq-block">
+    $$M_j(\alpha) = \sum_{m=0}^{\infty} \frac{(-\alpha)^m}{m!} \cdot \frac{N^{j+m+1}}{j+m+1}$$
+  </div>
+
+  <p>
+    With this in place, the $O(h^7)$ weights are numerically stable across all standard RL discount parameters. As $\gamma\lambda \to 1$ (no discount), the weights converge to the standard 7-point Newton-Cotes closed rule $\frac{1}{140}[41, 216, 27, 272, 27, 216, 41]$ -- a useful limiting-case sanity check.
+  </p>
+
+  <!-- ── Section 3 ────────────────────────────────────────────── -->
+  <h2>What Goes Wrong: The Continuous Control Problem</h2>
+
+  <p>
+    The $O(h^7)$ rule without any regularization matches or approaches GAE on discrete control environments. On CartPole, the advantage variance is 14x lower from the very first rollout. On LunarLander, it is consistently one order of magnitude lower throughout training.
+  </p>
+
+  <p>Then we tested on HalfCheetah.</p>
+
+  <div class="callout">
+    <strong>The advantage variance of the unregularized $O(h^7)$ rule explodes in early HalfCheetah training</strong> -- spikes to $10^4$ to $10^5$ on the log scale, roughly 100 to 1000 times higher than GAE. These are not logging artifacts. They represent individual rollouts where the quadrature weights, applied to large continuous-control TD residuals, produce completely degenerate advantage estimates. Training never recovers. Mean final reward at 500k steps: approximately &minus;80 vs GAE's &minus;10.
+  </div>
+
+  <p>
+    The root cause is that a weight sequence optimized only for polynomial exactness can have large oscillations -- peaks and sign alternations that amplify noise in the TD residuals. In CartPole, where rewards are always 1.0 and TD residuals are small and smooth, this is not a problem. In HalfCheetah, where TD residuals are large and noisy from a poorly-initialized value function, it is catastrophic.
+  </p>
+
+  <!-- ── Section 4 ────────────────────────────────────────────── -->
+  <h2>The Fix: Simpson-Sobolev Regularization</h2>
+
+  <p>
+    The solution comes from numerical PDE theory. Rather than finding the unique weight sequence satisfying all $H$ moment conditions, we impose only 4 moment conditions (giving $O(h^4)$ accuracy) and use the remaining $H-4$ degrees of freedom to minimize a smoothness penalty on the weight sequence itself.
+  </p>
+
+  <p>
+    The penalty is the Simpson-approximated $H^2$ Sobolev norm of the weight sequence treated as a discrete function:
+  </p>
+
+  <div class="eq-block">
+    $$J(\mathbf{w}) = \mu_0\, \mathbf{w}^\top S\, \mathbf{w} + \mu_1\, (L_1\mathbf{w})^\top S_1 (L_1\mathbf{w}) + \mu_2\, (L_2\mathbf{w})^\top S_2 (L_2\mathbf{w})$$
+  </div>
+
+  <p>
+    where $S$, $S_1$, $S_2$ are diagonal matrices of composite Simpson quadrature weights for sequences of length $H$, $H-1$, $H-2$, and $L_1$, $L_2$ are finite difference operators. The three terms penalize the magnitude of the weights, the variation between adjacent weights, and the curvature of the weight sequence respectively.
+  </p>
+
+  <p>The solution is a constrained minimum solved in closed form via Lagrange multipliers:</p>
+
+  <div class="eq-block">
+    $$\mathbf{w}^* = R^{-1} V_4^\top \left(V_4 R^{-1} V_4^\top\right)^{-1} \mathbf{M}_4$$
+  </div>
+
+  <p>
+    where $R = \mu_0 S + \mu_1 L_1^\top S_1 L_1 + \mu_2 L_2^\top S_2 L_2$ is symmetric positive definite, $V_4$ is the 4-row Vandermonde matrix on the stencil nodes, and $\mathbf{M}_4$ is the vector of the first four moments.
+  </p>
+
+  <div class="pull-quote">
+    A weight sequence that oscillates or has sharp peaks amplifies high-frequency noise in $\delta_t$. The Sobolev penalty enforces that $\mathbf{w}$ varies smoothly as a function of its node index -- appropriate, since the optimal weights should inherit the smoothness of the exponential discount $e^{-\alpha k}$.
+  </div>
+
+  <p>
+    The penalty structure is adapted from Simpson-Sobolev regularization developed in the author's dissertation on neural network training, where the same three-term penalty on function value, first derivative, and second derivative is applied to the network output integrated via Simpson's rule on a 7-point stencil.
+  </p>
+
+  <!-- ── Section 5 ────────────────────────────────────────────── -->
+  <h2>Empirical Results</h2>
+
+  <p>Four estimators, four environments (CartPole-v1 clean and noisy at $\sigma=1.0$, LunarLander-v3, HalfCheetah-v4), PPO, 3 seeds each.</p>
+
+  <h3>Advantage Variance</h3>
+
+  <p>
+    Across all environments, <code>sobolev_h4</code> produces the lowest or near-lowest advantage variance. On clean CartPole, the early-training variance is 14x lower than GAE from the very first rollout. On LunarLander it is roughly one order of magnitude below GAE throughout 300k steps.
+  </p>
+
+  <p>
+    The clean vs noisy CartPole comparison is the key test of the theoretical prediction. On the clean environment, both <code>quadrature_h7</code> and <code>sobolev_h4</code> start dramatically lower than GAE. On the noisy environment, <code>sobolev_h4</code> maintains its advantage while <code>quadrature_h7</code> -- without regularization -- drifts upward as noisy rewards corrupt the weight application.
+  </p>
+
+  <h3>Final Reward</h3>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Environment</th>
+        <th>GAE</th>
+        <th>Quadrature O(h&#x2077;)</th>
+        <th>Sobolev O(h&#x2074;)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CartPole (clean)</td>
+        <td>~50</td>
+        <td class="worst">~42</td>
+        <td class="best">~58</td>
+      </tr>
+      <tr>
+        <td>CartPole (noisy, &sigma;=1.0)</td>
+        <td>~55</td>
+        <td class="worst">~33 (&minus;40%)</td>
+        <td class="best">~55</td>
+      </tr>
+      <tr>
+        <td>LunarLander-v3</td>
+        <td>~&minus;160</td>
+        <td>~&minus;155</td>
+        <td>~&minus;175</td>
+      </tr>
+      <tr class="highlight">
+        <td>HalfCheetah-v4</td>
+        <td>~&minus;10</td>
+        <td class="worst">~&minus;80 (8&times; gap)</td>
+        <td class="best">~&minus;15</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>
+    On HalfCheetah the story is starkest. <code>quadrature_h7</code> achieves approximately &minus;80 final reward vs GAE's &minus;10 -- an 8&times; reward gap caused entirely by the absence of regularization. <code>sobolev_h4</code> tracks GAE closely at approximately &minus;15.
+  </p>
+
+  <div class="callout success">
+    <strong>The headline finding:</strong> the Sobolev penalty is necessary, not optional. The pure higher-order rule without regularization fails on continuous control. The regularized rule succeeds.
+  </div>
+
+  <h3>Environment-by-Environment Summary</h3>
+
+  <div class="env-grid">
+    <div class="env-card">
+      <h4>CartPole (clean)</h4>
+      <p class="verdict good">sobolev_h4 wins</p>
+      <p>14&times; variance reduction from rollout 1. All methods reach similar final reward, but sobolev_h4 edges ahead (~58 vs ~50 for GAE). The smooth, near-polynomial TD residuals are exactly where higher-order accuracy shines.</p>
+    </div>
+    <div class="env-card">
+      <h4>CartPole (noisy &sigma;=1.0)</h4>
+      <p class="verdict good">sobolev_h4 &#x2248; GAE</p>
+      <p>The critical test. sobolev_h4 and GAE finish at ~55. quadrature_h7 degrades to ~33 -- a 40% drop. Sobolev smoothing prevents reward noise from corrupting the weight application.</p>
+    </div>
+    <div class="env-card">
+      <h4>LunarLander-v3</h4>
+      <p class="verdict neutral">Methods comparable</p>
+      <p>All three finish in the &minus;155 to &minus;175 range at 300k steps. sobolev_h4 maintains ~1 order-of-magnitude lower variance throughout, but the reward gap is within noise at this training length.</p>
+    </div>
+    <div class="env-card">
+      <h4>HalfCheetah-v4</h4>
+      <p class="verdict bad">quadrature_h7 fails</p>
+      <p>Catastrophic variance explosions ($10^4$&ndash;$10^5$) in early training. Training never recovers. sobolev_h4 stays stable and matches GAE. The 8&times; reward gap is the most consequential result.</p>
+    </div>
+  </div>
+
+  <!-- ── Section 6 ────────────────────────────────────────────── -->
+  <h2>The Sobolev Smoothing Effect</h2>
+
+  <p>
+    Beyond the PPO benchmark, we characterized the Sobolev regularization's effect on the weight sequence itself. At $O(h^7)$ accuracy with stencil size $H$ ranging from 8 to 16, the improvement in $J(\mathbf{w})$ relative to the minimum-norm unconstrained solution peaks at $H=11$ -- four free parameters after imposing 7 moment conditions:
+  </p>
+
+  <table class="data-table">
+    <thead>
+      <tr><th>H</th><th>Free params</th><th>Smoothing improvement</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>8</td><td>1</td><td>0.10%</td></tr>
+      <tr><td>9</td><td>2</td><td>1.33%</td></tr>
+      <tr><td>10</td><td>3</td><td>1.35%</td></tr>
+      <tr class="highlight"><td><strong>11</strong></td><td><strong>4</strong></td><td><strong>1.89% (peak)</strong></td></tr>
+      <tr><td>12</td><td>5</td><td>1.13%</td></tr>
+      <tr><td>16</td><td>9</td><td>0.71%</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    The improvement peaks at four free parameters before diminishing as the wider window gives the unconstrained solution more room to be smooth on its own. $H=11$ is the empirically optimal stencil for the $O(h^7)$ Sobolev variant under standard RL discount parameters.
+  </p>
+
+  <!-- ── Section 7 ────────────────────────────────────────────── -->
+  <h2>Practical Recommendations</h2>
+
+  <p>Three methods are implemented:</p>
+
+  <ul style="margin:1em 0 1.5em 1.5em;">
+    <li style="margin-bottom:0.8em;"><code>sobolev_h4</code> &mdash; $O(h^4)$, Simpson-Sobolev regularization, $H \geq 5$. <strong>Recommended.</strong></li>
+    <li style="margin-bottom:0.8em;"><code>quadrature_h7</code> &mdash; $O(h^7)$, no regularization, $H = 7$. Use only on smooth environments.</li>
+    <li style="margin-bottom:0.8em;"><code>sobolev_h7</code> &mdash; $O(h^7)$, Simpson-Sobolev regularization, $H \geq 8$. $H=11$ recommended.</li>
+  </ul>
+
+  <p>
+    <code>sobolev_h4</code> is the recommended drop-in replacement for GAE. It matches or closely approaches GAE's reward across all tested environments, consistently reduces advantage variance by 4&ndash;14&times; early in training, and does not exhibit the instability that destroys <code>quadrature_h7</code> on continuous control.
+  </p>
+
+  <p>
+    <code>quadrature_h7</code> should only be used in environments with smooth, low-noise TD residuals where the value function is well-initialized. Its theoretical accuracy advantage is real -- near floating-point precision on polynomial TD residuals -- but that advantage is overwhelmed by variance amplification under noise.
+  </p>
+
+  <p>
+    <code>sobolev_h7</code> sits between the two: regularized at higher accuracy order, with $H=11$ recommended. It avoids catastrophic instability but underperforms <code>sobolev_h4</code> in the high-variance HalfCheetah environment, likely because the wider stencil exposes it to more trajectory variance.
+  </p>
+
+  <!-- ── Section 8 ────────────────────────────────────────────── -->
+  <h2>Open Questions</h2>
+
+  <p>
+    The $\mu_i$ penalty weights have no canonical values derived from RL theory. An adaptive scheme that estimates the noise level of $\delta_t$ online and adjusts accordingly would make the method self-tuning. The boundary effect (last $H-1$ trajectory steps falling back to GAE) is handled conservatively; a tapered stencil could do better. The HalfCheetah benchmark runs 500k steps, which is short -- longer runs with tuned hyperparameters might narrow the gaps.
+  </p>
+
+  <p>
+    The most important open question is whether the advantage variance reduction translates to sample efficiency improvement in the long run, or whether RL's other sources of noise dominate. The variance result is clean; the sample efficiency claim is not yet established.
+  </p>
+
+  <!-- ── Code ────────────────────────────────────────────────── -->
+  <h2>Code</h2>
+
+  <p>
+    All implementations are available at <a href="https://github.com/danmm16/quadrature-advantage">github.com/danmm16/quadrature-advantage</a>. The weights themselves require only JAX and NumPy; the benchmark additionally requires PyTorch and Gymnasium.
+  </p>
+
+  <div class="code-block"><span class="keyword">from</span> sobolev_h4 <span class="keyword">import</span> simpson_sobolev_weights
+<span class="keyword">import</span> jax.numpy <span class="keyword">as</span> jnp
+
+<span class="comment"># O(h^4) Sobolev weights -- recommended replacement for GAE</span>
+w = simpson_sobolev_weights(gamma=<span class="string">0.99</span>, lam=<span class="string">0.95</span>, H=<span class="string">5</span>)
+
+<span class="comment"># Apply to a window of TD residuals</span>
+delta_window = jnp.array([<span class="string">0.3</span>, <span class="string">0.1</span>, <span class="string">-0.2</span>, <span class="string">0.4</span>, <span class="string">0.0</span>])
+advantage_estimate = jnp.dot(w, delta_window)</div>
+
+  <p>
+    <a class="repo-link" href="https://github.com/danmm16/quadrature-advantage" target="_blank">View on GitHub</a>
+  </p>
+
+  <div class="footnote">
+    <p>
+      This work draws on exponentially-fitted numerical methods (Iserles, "A First Course in the Numerical Analysis of Differential Equations," Ch. 8) and Simpson-Sobolev regularization developed in the author's dissertation at SMU (2026). The PPO benchmark uses four environments, three seeds, and rollout length 128. HalfCheetah-v4 results are at 500k steps, which is short for this environment; the variance result is more robust to training length than the reward result.
+    </p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmotiveMind: The Macro-Economy of Emotion | Daniel Margolis</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 18px;
+      line-height: 1.75;
+      color: #1a1a1a;
+      background: #fafaf8;
+    }
+
+    .post-hero {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #e8e8f0;
+      padding: 80px 24px 60px;
+      text-align: center;
+    }
+
+    .post-hero .tag {
+      display: inline-block;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #a0b4d4;
+      margin-bottom: 20px;
+    }
+
+    .post-hero h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: normal;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      max-width: 720px;
+      margin: 0 auto 20px;
+    }
+
+    .post-hero .subtitle {
+      font-size: 18px;
+      color: #a0b4d4;
+      max-width: 560px;
+      margin: 0 auto;
+      font-style: italic;
+    }
+
+    .post-meta {
+      text-align: center;
+      padding: 24px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: #888;
+      border-bottom: 1px solid #e8e8e0;
+      background: #fff;
+    }
+
+    .post-body {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+    }
+
+    .post-body p {
+      margin-bottom: 1.5em;
+    }
+
+    .post-body h2 {
+      font-size: 24px;
+      font-weight: normal;
+      letter-spacing: -0.01em;
+      color: #1a1a2e;
+      margin: 2.5em 0 0.8em;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e0e0d8;
+    }
+
+    .post-body h3 {
+      font-size: 19px;
+      font-weight: bold;
+      color: #2a2a3e;
+      margin: 2em 0 0.6em;
+    }
+
+    .pull-quote {
+      border-left: 3px solid #0f3460;
+      padding: 16px 24px;
+      margin: 2em 0;
+      background: #f0f4ff;
+      font-style: italic;
+      color: #2a2a4e;
+      font-size: 17px;
+    }
+
+    .number-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 2em 0;
+      justify-content: center;
+    }
+
+    .emotion-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px 20px;
+      text-align: center;
+      min-width: 120px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .emotion-card .number {
+      font-family: 'Courier New', monospace;
+      font-size: 22px;
+      font-weight: bold;
+      color: #0f3460;
+      display: block;
+    }
+
+    .emotion-card .label {
+      font-size: 13px;
+      color: #666;
+      text-transform: lowercase;
+      margin-top: 4px;
+    }
+
+    .emotion-card.neutral .number { color: #888; }
+    .emotion-card.negative .number { color: #8b1a1a; }
+    .emotion-card.positive .number { color: #1a6b3c; }
+
+    .math-block {
+      background: #f8f8f0;
+      border: 1px solid #e0e0d0;
+      border-radius: 6px;
+      padding: 20px 24px;
+      margin: 1.5em 0;
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+      color: #2a2a2a;
+      overflow-x: auto;
+    }
+
+    .post-body ul {
+      margin: 1em 0 1.5em 1.5em;
+    }
+
+    .post-body li {
+      margin-bottom: 0.5em;
+    }
+
+    .repo-link {
+      display: inline-block;
+      background: #0f3460;
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      margin-top: 1em;
+      transition: background 0.2s;
+    }
+
+    .repo-link:hover { background: #16213e; }
+
+    .footnote {
+      margin-top: 3em;
+      padding-top: 2em;
+      border-top: 1px solid #e0e0d8;
+      font-size: 15px;
+      color: #666;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<div class="post-hero">
+  <span class="tag">Emotional Economy &mdash; Macro</span>
+  <h1>EmotiveMind: The Macro-Economy of Emotion</h1>
+  <p class="subtitle">On quantifying feeling through palindromic integers, and what happens when 500 emotional agents share a world</p>
+</div>
+
+<div class="post-meta">
+  Daniel Margolis &nbsp;&bull;&nbsp; Emotional-Economy-Micro-and-Macro &nbsp;&bull;&nbsp; 2026
+</div>
+
+<div class="post-body">
+
+  <p>
+    The framework behind EmotiveMind was born during a period of enforced stillness. Bedridden with Lyme disease, I began developing what I thought of at the time as a kind of Linux code for the brain of an organism &mdash; a modular, composable system for representing the basic operations of emotional life. The disease made thinking in the conventional sense difficult. It also, unexpectedly, created conditions for a different kind of thinking.
+  </p>
+
+  <p>
+    What emerged was a mathematical symbology for emotion: a small set of primitive emotional states, each assigned a precise numerical value, from which more complex emotional experiences could be constructed. This post describes the first computational realization of that framework &mdash; EmotiveMind, a simulation of 500 emotional agents inhabiting a shared space.
+  </p>
+
+  <h2>The Palindromic Integer System</h2>
+
+  <p>
+    The foundation is a set of five base emotions, each represented by a palindromic integer. Palindromes were chosen deliberately: they read the same forwards and backwards, embodying a kind of internal symmetry that felt right for the most fundamental emotional states &mdash; states that do not point anywhere outside themselves.
+  </p>
+
+  <div class="number-display">
+    <div class="emotion-card negative">
+      <span class="number">131</span>
+      <span class="label">hate</span>
+    </div>
+    <div class="emotion-card negative">
+      <span class="number">13831</span>
+      <span class="label">dislike</span>
+    </div>
+    <div class="emotion-card neutral">
+      <span class="number">381</span>
+      <span class="label">neutrality</span>
+    </div>
+    <div class="emotion-card positive">
+      <span class="number">76867</span>
+      <span class="label">like</span>
+    </div>
+    <div class="emotion-card positive">
+      <span class="number">767</span>
+      <span class="label">love</span>
+    </div>
+  </div>
+
+  <p>
+    The structure here is not arbitrary. The extreme emotions &mdash; hate and love &mdash; are compact three-digit palindromes. The moderate emotions &mdash; dislike and like &mdash; are five-digit palindromes that embed the extremes within them. Dislike contains hate at its core (131 sits inside 13831); like contains love at its core (767 sits inside 76867). The moderate states are expansions of the extremes, not dilutions of them.
+  </p>
+
+  <p>
+    Both expanded palindromes carry the central digit of neutrality: 8. The digit 8 sits at the center of 13831 and at the center of 76867. Moderate emotion, in this system, is not simply a reduced version of extremity. It is extremity tempered by the presence of neutral ground.
+  </p>
+
+  <div class="pull-quote">
+    Dislike is hate with neutrality woven through it. Like is love with neutrality woven through it. The moderate states are composites, not scaled versions.
+  </div>
+
+  <p>
+    The values are derived from a (n&minus;1)/n fractional structure, where each integer n generates a corresponding emotional value. The fractions all approach 1 asymptotically &mdash; every base emotion carries some irresolvable remainder, a permanent distance from wholeness. Hate carries a large remainder; love carries a small one. Neutrality occupies the center.
+  </p>
+
+  <h2>Why This Is an Economy</h2>
+
+  <p>
+    The word "economy" in the repository name is precise. An economy is a system in which agents exchange limited resources according to value signals. EmotiveMind treats emotional states as those resources. The agents in the simulation do not simply possess emotional states &mdash; they exchange, propagate, and compete over them. There are production dynamics (new emotional states generated from interaction), consumption dynamics (states absorbed into knowledge blocks), and disposal dynamics (states that cannot be processed are removed from circulation).
+  </p>
+
+  <p>
+    At the macro level, this economy operates agent by agent. Each of the 500 agents in EmotiveMind carries an internal emotional state &mdash; a numerical value within the palindromic system &mdash; and updates that state based on interactions with neighboring agents and the injection interface. The aggregate behavior of 500 interacting agents produces something that looks, over time, less like a collection of individual feelings and more like a market.
+  </p>
+
+  <h2>The Simulation Architecture</h2>
+
+  <h3>Agents</h3>
+  <p>
+    Five hundred agents occupy the simulation space. Each agent carries an emotional state encoded as an RGB triple derived from the palindromic values &mdash; hate maps to high red, love maps to high blue, neutrality maps to gray, with dislike and like occupying intermediate channels. The visual representation is intentional: the simulation lets you see the emotional state of the population at a glance.
+  </p>
+
+  <h3>Knowledge Blocks</h3>
+  <p>
+    Emotional states that have been processed &mdash; understood, worked through, integrated &mdash; are stored in knowledge blocks. These function as the simulation's memory. An agent that encounters a state it has processed before responds differently than one encountering it fresh. Knowledge blocks accumulate over time, and their growth rate reflects how much emotional processing is occurring in the system.
+  </p>
+
+  <h3>The Disposal System</h3>
+  <p>
+    Not all emotional states can be processed. Some combinations of states, when they meet in an agent, produce irresolvable conflict &mdash; numerical values that cannot be reconciled within the palindromic structure. These states enter the disposal system. Watching what the simulation disposes of, and at what rate, is one of the more telling diagnostics of the system's overall health.
+  </p>
+
+  <h3>Emotional Injection</h3>
+  <p>
+    The injection interface allows an external observer to introduce emotional states directly into the population. You can inject hate, love, neutrality, or any point on the spectrum. The simulation then tracks how the injected state propagates, whether it is absorbed into knowledge blocks, and whether it destabilizes or stabilizes the surrounding agents. Injection is how the simulation becomes interactive rather than merely observed.
+  </p>
+
+  <h2>The CaseFile</h2>
+
+  <p>
+    Alongside EmotiveMind sits CaseFile.jsx &mdash; a persistent observation log. MRI readings (snapshots of the simulation state at fixed intervals), session notes, and wanderer records (the trajectories of individual agents through emotional space) are all stored in the CaseFile. It is less a tool for controlling the simulation than a record of having watched it.
+  </p>
+
+  <p>
+    The MRI language is deliberate. In clinical MRI, you observe the interior of a system without altering it. The CaseFile aspires to the same posture: present for the observation, not the intervention.
+  </p>
+
+  <h2>What the Simulation Is For</h2>
+
+  <p>
+    EmotiveMind is not a theory of mind. It does not claim to accurately model how human beings feel things. What it does is take seriously the proposition that emotional states have structure &mdash; that they are not just noise, not just labels for physiological events, but objects with internal organization that can be represented, combined, and studied formally.
+  </p>
+
+  <p>
+    The simulation makes the macro-economy of feeling visible. It turns a philosophical intuition &mdash; that emotions have arithmetic, that the moderate states embed the extreme ones, that feeling can be quantified without being diminished &mdash; into something you can run, observe, and be surprised by.
+  </p>
+
+  <div class="pull-quote">
+    The goal was not to reduce emotion to number. The goal was to find the number already living inside the emotion.
+  </div>
+
+  <p>
+    The companion visualization, HyperbolicMind, takes this same framework into macro territory &mdash; a continuous field on a hyperbolic manifold rather than 500 discrete agents in Cartesian space. Together they constitute the Emotional Economy: HyperbolicMind at the micro level (one mind, one manifold) and EmotiveMind at the macro level (many minds, one market).
+  </p>
+
+  <p>
+    <a class="repo-link" href="https://github.com/danmm16/Emotional-Economy-Micro-and-Macro" target="_blank">View on GitHub</a>
+  </p>
+
+  <div class="footnote">
+    <p>The palindromic integer framework was developed during illness and is still being reconstructed. The precise derivation of the (n&minus;1)/n fractional structure, and the exact formula connecting n to the palindromic values, remains an open part of this project.</p>
+  </div>
+
+</div>
+</body>
+</html>

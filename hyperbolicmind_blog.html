@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HyperbolicMind: The Micro-Economy of Emotion | Daniel Margolis</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 18px;
+      line-height: 1.75;
+      color: #1a1a1a;
+      background: #fafaf8;
+    }
+
+    .post-hero {
+      background: linear-gradient(135deg, #0d1b2a 0%, #1b2838 50%, #2d4a6e 100%);
+      color: #dde8f4;
+      padding: 80px 24px 60px;
+      text-align: center;
+    }
+
+    .post-hero .tag {
+      display: inline-block;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #8ab4d4;
+      margin-bottom: 20px;
+    }
+
+    .post-hero h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: normal;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      max-width: 720px;
+      margin: 0 auto 20px;
+    }
+
+    .post-hero .subtitle {
+      font-size: 18px;
+      color: #8ab4d4;
+      max-width: 560px;
+      margin: 0 auto;
+      font-style: italic;
+    }
+
+    .post-meta {
+      text-align: center;
+      padding: 24px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: #888;
+      border-bottom: 1px solid #e8e8e0;
+      background: #fff;
+    }
+
+    .post-body {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+    }
+
+    .post-body p { margin-bottom: 1.5em; }
+
+    .post-body h2 {
+      font-size: 24px;
+      font-weight: normal;
+      letter-spacing: -0.01em;
+      color: #0d1b2a;
+      margin: 2.5em 0 0.8em;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e0e0d8;
+    }
+
+    .post-body h3 {
+      font-size: 19px;
+      font-weight: bold;
+      color: #1b2838;
+      margin: 2em 0 0.6em;
+    }
+
+    .pull-quote {
+      border-left: 3px solid #2d4a6e;
+      padding: 16px 24px;
+      margin: 2em 0;
+      background: #f0f5ff;
+      font-style: italic;
+      color: #1b2a4e;
+      font-size: 17px;
+    }
+
+    .disk-diagram {
+      margin: 2em auto;
+      text-align: center;
+    }
+
+    .disk-diagram svg {
+      max-width: 320px;
+      width: 100%;
+    }
+
+    .math-block {
+      background: #f8f8f0;
+      border: 1px solid #e0e0d0;
+      border-radius: 6px;
+      padding: 20px 24px;
+      margin: 1.5em 0;
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+      color: #2a2a2a;
+      overflow-x: auto;
+    }
+
+    .ring-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 15px;
+    }
+
+    .ring-table th {
+      background: #0d1b2a;
+      color: #dde8f4;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: normal;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+    }
+
+    .ring-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #e8e8e0;
+      vertical-align: top;
+    }
+
+    .ring-table tr:nth-child(even) td { background: #f4f6fa; }
+
+    .post-body ul {
+      margin: 1em 0 1.5em 1.5em;
+    }
+
+    .post-body li { margin-bottom: 0.5em; }
+
+    .repo-link {
+      display: inline-block;
+      background: #0d1b2a;
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      margin-top: 1em;
+      transition: background 0.2s;
+    }
+
+    .repo-link:hover { background: #1b2838; }
+
+    .footnote {
+      margin-top: 3em;
+      padding-top: 2em;
+      border-top: 1px solid #e0e0d8;
+      font-size: 15px;
+      color: #666;
+      font-style: italic;
+    }
+
+    .attractor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 1.5em 0;
+    }
+
+    .attractor-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .attractor-card h4 {
+      font-size: 14px;
+      font-family: 'Courier New', monospace;
+      color: #0d1b2a;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .attractor-card p {
+      font-size: 15px;
+      color: #444;
+      margin: 0;
+    }
+
+    @media (max-width: 500px) {
+      .attractor-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="post-hero">
+  <span class="tag">Emotional Economy &mdash; Micro</span>
+  <h1>HyperbolicMind: The Micro-Economy of Emotion</h1>
+  <p class="subtitle">On modeling the interior of a single mind as a hyperbolic manifold, where the infinite complexity of feeling lives inside a bounded disk</p>
+</div>
+
+<div class="post-meta">
+  Daniel Margolis &nbsp;&bull;&nbsp; Emotional-Economy-Micro-and-Macro &nbsp;&bull;&nbsp; 2026
+</div>
+
+<div class="post-body">
+
+  <p>
+    EmotiveMind models the emotional economy at the macro level: 500 agents, a shared space, a population whose aggregate behavior constitutes a kind of emotional market. HyperbolicMind asks a different question. Before there can be a market, there must be a mind. What does the interior of one mind look like, and what geometry is adequate to its complexity?
+  </p>
+
+  <p>
+    The answer proposed here is hyperbolic geometry. Not as a metaphor, but as a formal model. HyperbolicMind is a cellular automaton running on a Poincar&eacute; disk &mdash; a visualization of a single continuous emotional field evolving on a Riemannian manifold. It is the micro in the Emotional Economy: not an aggregate, but an interior.
+  </p>
+
+  <h2>Why Hyperbolic Geometry</h2>
+
+  <p>
+    Euclidean geometry assumes that parallel lines stay parallel, that distance accumulates linearly, that the boundary of a circle is exactly as far from the center as its radius suggests. None of these assumptions hold well for the interior of a mind.
+  </p>
+
+  <p>
+    Consider how emotional states actually distribute in consciousness. The center &mdash; the resting self, neutrality, the baseline &mdash; is dense and accessible. There is a lot of territory here. The extremes &mdash; hate, ecstasy, profound grief &mdash; feel both close and infinitely far. You can approach them, get very near, and still find more territory ahead. The closer you get to the boundary, the more distance there seems to be.
+  </p>
+
+  <p>
+    This is exactly what hyperbolic geometry describes. In a Poincar&eacute; disk model of hyperbolic space, geodesic distance grows as:
+  </p>
+
+  <div class="math-block">d(r) = arctanh(r / R)  &rarr;  &infin;  as  r &rarr; R</div>
+
+  <p>
+    The boundary is at infinite hyperbolic distance from the center, even though the Euclidean radius is finite. The space is boundless inside a bounded shape. A mind has this property: it is phenomenologically infinite while being physically enclosed.
+  </p>
+
+  <div class="disk-diagram">
+    <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="diskGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#e8f4f8"/>
+          <stop offset="60%" stop-color="#b8d4e8"/>
+          <stop offset="100%" stop-color="#2d4a6e"/>
+        </radialGradient>
+      </defs>
+      <circle cx="160" cy="160" r="148" fill="url(#diskGrad)" stroke="#0d1b2a" stroke-width="2"/>
+      <!-- rings -->
+      <circle cx="160" cy="160" r="30"  fill="none" stroke="#fff" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.6"/>
+      <circle cx="160" cy="160" r="60"  fill="none" stroke="#fff" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+      <circle cx="160" cy="160" r="90"  fill="none" stroke="#fff" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.4"/>
+      <circle cx="160" cy="160" r="118" fill="none" stroke="#fff" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.3"/>
+      <circle cx="160" cy="160" r="135" fill="none" stroke="#fff" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.2"/>
+      <!-- center dot -->
+      <circle cx="160" cy="160" r="5" fill="#fff" opacity="0.9"/>
+      <!-- labels -->
+      <text x="160" y="156" text-anchor="middle" font-size="9" fill="#fff" font-family="Georgia" opacity="0.9">neutral</text>
+      <text x="160" y="38" text-anchor="middle" font-size="9" fill="#fff" font-family="Georgia" opacity="0.7">extremity &rarr; &infin;</text>
+      <text x="160" y="310" text-anchor="middle" font-size="9" fill="#fff" font-family="Georgia" opacity="0.5">boundary at &infin; hyperbolic distance</text>
+    </svg>
+    <p style="font-size:13px;color:#888;margin-top:8px;font-family:'Courier New',monospace;">Poincar&eacute; disk: neutral center, emotionally extreme boundary</p>
+  </div>
+
+  <p>
+    The visual representation compresses the outer rings to make room for the richly textured interior. This is not a distortion &mdash; it is an honest representation of how hyperbolic distance works. The inner rings are wide because they contain a lot of accessible emotional territory. The outer rings compress toward the boundary because the territory there, though vast, is further away in every sense that matters.
+  </p>
+
+  <h2>The Metric</h2>
+
+  <p>
+    Each cell in HyperbolicMind carries a Poincar&eacute; metric factor that scales how strongly it participates in the dynamics:
+  </p>
+
+  <div class="math-block">mf = (1 &minus; r&sup2;)&sup2;</div>
+
+  <p>
+    where r is the normalized visual radius of the cell (0 at center, approaching 1 at boundary). This factor is maximal at the center (mf = 1) and approaches zero at the boundary. The center of the disk is the most dynamically active region &mdash; the place where emotional states mix, diffuse, and interact most freely. The boundary is nearly inert.
+  </p>
+
+  <p>
+    This matches intuition. The extreme states near the boundary of experience are not the most actively processed states. They are powerful but slow. The interior &mdash; the territory of day-to-day feeling &mdash; is where the dynamics are richest.
+  </p>
+
+  <h2>The Dynamics</h2>
+
+  <h3>Diffusion</h3>
+  <p>
+    Emotional states spread across the disk by diffusion with coefficient 0.07. Each cell's state at the next timestep is a weighted blend of its current state and those of its neighbors, scaled by the metric factor. The diffusion rate was chosen empirically: too high and the field converges too quickly to gray, losing all structure; too low and injected states fade without propagating.
+  </p>
+
+  <p>
+    The metric factor means diffusion is faster at the center and slower at the rim. Emotional states injected at the center spread readily through the accessible territory. States injected near the boundary spread slowly, staying localized near where they were placed.
+  </p>
+
+  <h3>Saturation Boost</h3>
+  <p>
+    Rather than coupling cells through a direct interaction term, HyperbolicMind uses a saturation boost: cells with high-intensity emotional states amplify their own saturation at the next step rather than pulling neighboring cells toward their state. This prevents the artificial synchronization that direct coupling produces, where the whole disk converges to a single dominant state. Saturation boost keeps the field vivid and sustained without forcing uniformity.
+  </p>
+
+  <p>
+    The decision to remove cyclic coupling &mdash; an earlier design that had cells pushing their states in a circular chain &mdash; came after observing that it created artificial traveling waves with no psychological interpretation. The mind does not pass emotions around in a ring. It sustains them locally and diffuses them gently outward.
+  </p>
+
+  <h2>Two Attractors</h2>
+
+  <p>
+    The field is shaped by two competing attractors, which between them account for most of the interesting dynamics:
+  </p>
+
+  <div class="attractor-grid">
+    <div class="attractor-card">
+      <h4>Center Injection</h4>
+      <p>Emotional states introduced at the center of the disk. These propagate outward through the interior, reaching the middle rings with moderate intensity before fading near the boundary. Center injection represents internally generated emotion &mdash; feeling that begins in the self and radiates outward.</p>
+    </div>
+    <div class="attractor-card">
+      <h4>Rim Environment</h4>
+      <p>The boundary conditions of the disk, representing environmental input &mdash; emotion generated by what arrives from outside. Rim states diffuse inward slowly, filtered by the metric. They rarely reach the center with full intensity, but they color the middle rings and shape the context in which center-generated states develop.</p>
+    </div>
+  </div>
+
+  <p>
+    The interaction between these two attractors produces the characteristic behavior of the simulation: states generated from within and states arriving from without meeting somewhere in the middle rings, negotiating with each other through diffusion, leaving traces in the field that linger beyond the initial injection.
+  </p>
+
+  <h2>The One-Way MRI Protocol</h2>
+
+  <p>
+    The MRI protocol in HyperbolicMind is designed around a single constraint: observation without alteration. A standard MRI machine measures internal structure by reading the response of a system to a field it introduces &mdash; which means it inevitably disturbs what it measures. The one-way protocol here inverts this: the observer reads the field state without injecting anything.
+  </p>
+
+  <p>
+    In practice this means the MRI samples the disk state at regular intervals, recording the distribution of emotional values across all rings, without triggering any injection or reset. The readings accumulate in the CaseFile alongside EmotiveMind's macro-level records. Comparing the two gives you the micro and macro views of the same emotional economy simultaneously: one mind in full interior detail, and the population it belongs to.
+  </p>
+
+  <h2>Ring Structure</h2>
+
+  <p>
+    The disk is organized into concentric rings with logarithmic radial spacing. The inner rings are wider in pixel space and contain more cells &mdash; reflecting the denser, more accessible structure of the emotional interior. The outer rings narrow toward the boundary. Each ring has a characteristic radius, metric factor, and diffusion profile.
+  </p>
+
+  <p>
+    The ring structure connects HyperbolicMind to the palindromic integer framework. The central rings correspond to neutrality and the moderate states (dislike, like), where most day-to-day emotional life occurs. The outer rings, at increasing hyperbolic distance from the center, correspond to the extreme states: hate and love, encoded as 131 and 767, approached but never fully reached.
+  </p>
+
+  <div class="pull-quote">
+    The boundary of the disk is at infinite hyperbolic distance from the center. Hate and love are always reachable and never fully reached. This is not a limitation of the model. It is the point of it.
+  </div>
+
+  <h2>What the Simulation Shows</h2>
+
+  <p>
+    HyperbolicMind makes the interior topology of an emotional mind visible. It shows that emotional space is not flat &mdash; that the distances between states are not the same in every direction, that the center is not like the periphery, that extreme states are at once closer and further than they appear.
+  </p>
+
+  <p>
+    It also shows something about stability. A field with two attractors and a gentle diffusion coefficient does not collapse. It maintains structure over time. The center stays active, the rim stays colored, the middle rings carry the ongoing negotiation between inside and outside. A mind, this suggests, is not a system that settles. It is a system that remains perpetually in motion, never arriving at rest but never flying apart.
+  </p>
+
+  <p>
+    The companion simulation, EmotiveMind, takes this same emotional framework into macro territory &mdash; 500 such interiors, each interacting with the others, producing the aggregate dynamics of an emotional economy. Together they constitute the Emotional Economy: HyperbolicMind at the micro level (one mind, one manifold) and EmotiveMind at the macro level (many minds, one market).
+  </p>
+
+  <p>
+    <a class="repo-link" href="https://github.com/danmm16/Emotional-Economy-Micro-and-Macro" target="_blank">View on GitHub</a>
+  </p>
+
+  <div class="footnote">
+    <p>HyperbolicMind is a companion to EmotiveMind, both housed in the Emotional-Economy-Micro-and-Macro repository. The palindromic integer framework underlying both visualizations &mdash; hate=131, dislike=13831, neutrality=381, like=76867, love=767 &mdash; was developed during illness and remains an ongoing reconstruction.</p>
+  </div>
+
+</div>
+</body>
+</html>
