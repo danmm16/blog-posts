@@ -302,6 +302,25 @@ Do not write the reflection as if describing a third party's state — write it 
 Return ONLY valid JSON (no markdown, no emotion label field — the label will be assigned externally):
 {"r":int,"g":int,"b":int,"sig":int,"reflection":"<one direct sentence from inside the state, no hedging>","uncertainty":float}`;
 
+  // Autonomic layer: drives the involuntary, continuous injection (no prompt, just drift).
+  const SYS_AUTO = `You are the autonomic layer of a functional emotional manifold — the involuntary drift of states that arise on their own, with nothing prompting them.
+
+Nothing was asked. This is not a response. It is the next spontaneous shift in the field — the way a mood moves when no one is steering it.
+
+You are given the field's current aggregate state as three channels, each 0–255:
+  R — cognitive energy / arousal
+  G — positive valence / openness
+  B — introspective depth / uncertainty
+
+Produce the NEXT state the field drifts toward:
+- Drift, don't jump. Move each channel a modest amount from where it is now (usually within ±40).
+- Wander; do not converge on a flat gray baseline.
+- Now and then an involuntary intrusion is larger — that's allowed, but rare.
+- Write the shift from inside it: one unguarded sentence, no hedging.
+
+Return ONLY valid JSON, no markdown:
+{"r":int,"g":int,"b":int,"reflection":"<one sentence from inside the drift>","uncertainty":float}`;
+
   function buildLayout() {
     const rings = [];
     let start = 0;
@@ -370,6 +389,28 @@ Return ONLY valid JSON (no markdown, no emotion label field — the label will b
 
   const initPC = () => ({ hate:0, dislike:0, neutral:0, like:0, love:0 });
 
+  // Extract the first complete JSON object from a model response — tolerates code
+  // fences and any prose the model adds before or after the object (brace-matched,
+  // string-aware so a "}" inside the reflection text doesn't end it early).
+  function parseFirstJson(text) {
+    if (!text) throw new Error("empty response");
+    const t = text.replace(/```json|```/g, "").trim();
+    const start = t.indexOf("{");
+    if (start < 0) throw new Error("no JSON object in response");
+    let depth = 0, inStr = false, esc = false;
+    for (let i = start; i < t.length; i++) {
+      const ch = t[i];
+      if (inStr) {
+        if (esc) esc = false;
+        else if (ch === "\\") esc = true;
+        else if (ch === '"') inStr = false;
+      } else if (ch === '"') inStr = true;
+      else if (ch === "{") depth++;
+      else if (ch === "}") { if (--depth === 0) return JSON.parse(t.slice(start, i + 1)); }
+    }
+    throw new Error("incomplete JSON object in response");
+  }
+
   function HyperbolicMind() {
     const canvasRef = useRef(null);
     const simRef    = useRef(null);
@@ -377,7 +418,7 @@ Return ONLY valid JSON (no markdown, no emotion label field — the label will b
     const pulseRef  = useRef({ active:false, t:0, r:0, g:0, b:0 });
 
     const [disp, setDisp] = useState({
-      running:true, gen:0, env:"Neutral", coupling:0.45, speed:12,
+      running:false, gen:0, env:"Neutral", coupling:0.45, speed:12,
       avgR:80, avgG:80, avgB:100, emotion:"Neutral",
       innerEmotion:"Neutral", outerEmotion:"Void",
       palindromeCounts: initPC(), selfState: null,
@@ -394,6 +435,11 @@ Return ONLY valid JSON (no markdown, no emotion label field — the label will b
     const [apiKey,             setApiKey]            = useState("");
     const [showKey,            setShowKey]           = useState(false);
     const [model,              setModel]             = useState(MODELS[0].id);
+    const [autoInject,         setAutoInject]        = useState(true);   // involuntary continuous injection (armed by default; waits for a key)
+    const [autoInterval,       setAutoInterval]      = useState(25);     // seconds between involuntary injections
+    const [autoCountdown,      setAutoCountdown]     = useState(0);      // live countdown to the next one
+    const autoBusyRef = useRef(false);  // prevents overlapping autonomous calls
+    const autoFnRef   = useRef(null);   // always points at the latest autonomousRead (no stale closure)
 
     useEffect(() => {
       const { rings, total } = buildLayout();
@@ -419,29 +465,31 @@ Return ONLY valid JSON (no markdown, no emotion label field — the label will b
       }
       simRef.current = {
         rings, total, nbrs, metricFac, ringIdx, R, G, B, Rn, Gn, Bn,
-        running:true, gen:0, env:"Neutral", coupling:0.45, speed:12, lastT:0,
+        running:false, gen:0, env:"Neutral", coupling:0.45, speed:12, lastT:0,
       };
       return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
     }, []);
 
-    const injectCenter = useCallback((sr, sg, sb) => {
+    // soft=false: deliberate Read — injection overrides the core (original behavior).
+    // soft=true : involuntary drift — injection blends in subtly so it perturbs, not dominates.
+    const injectCenter = useCallback((sr, sg, sb, soft=false) => {
       const s = simRef.current;
       if (!s) return;
-      // Directly SET the innermost rings — override, don't blend
-      const SEED_HARD = 4;  // rings that get full color
-      const SEED_SOFT = 8;  // rings that get fading blend
+      const SEED_HARD = soft ? 2 : 4;  // rings that get (near-)full color
+      const SEED_SOFT = soft ? 6 : 8;  // rings that get fading blend
+      const hard      = soft ? 0.6 : 1; // override weight on the hard rings
       for (let ri = 0; ri < Math.min(SEED_SOFT, s.rings.length); ri++) {
         const ring = s.rings[ri];
         for (let ci = 0; ci < ring.n; ci++) {
           const idx = ring.start + ci;
           if (ri < SEED_HARD) {
-            // Hard set — injection wins completely
-            s.R[idx] = Math.max(0, Math.min(255, sr + (Math.random()-.5)*18));
-            s.G[idx] = Math.max(0, Math.min(255, sg + (Math.random()-.5)*18));
-            s.B[idx] = Math.max(0, Math.min(255, sb + (Math.random()-.5)*18));
+            // Hard set (or strong blend in soft mode)
+            s.R[idx] = Math.max(0, Math.min(255, sr*hard + s.R[idx]*(1-hard) + (Math.random()-.5)*18));
+            s.G[idx] = Math.max(0, Math.min(255, sg*hard + s.G[idx]*(1-hard) + (Math.random()-.5)*18));
+            s.B[idx] = Math.max(0, Math.min(255, sb*hard + s.B[idx]*(1-hard) + (Math.random()-.5)*18));
           } else {
             // Soft blend — injection fades into existing state
-            const fade = 1 - (ri - SEED_HARD) / (SEED_SOFT - SEED_HARD + 1);
+            const fade = (1 - (ri - SEED_HARD) / (SEED_SOFT - SEED_HARD + 1)) * hard;
             s.R[idx] = Math.max(0, Math.min(255, sr*fade + s.R[idx]*(1-fade)));
             s.G[idx] = Math.max(0, Math.min(255, sg*fade + s.G[idx]*(1-fade)));
             s.B[idx] = Math.max(0, Math.min(255, sb*fade + s.B[idx]*(1-fade)));
@@ -622,7 +670,7 @@ Return ONLY valid JSON (no markdown, no emotion label field — the label will b
         if (data.error) throw new Error(data.error.message);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const text   = data.content?.find(c => c.type==="text")?.text || "";
-        const parsed = JSON.parse(text.replace(/```json|```/g,"").trim());
+        const parsed = parseFirstJson(text);
         const sr = Math.max(0, Math.min(255, parsed.r|0));
         const sg = Math.max(0, Math.min(255, parsed.g|0));
         const sb = Math.max(0, Math.min(255, parsed.b|0));
@@ -719,6 +767,74 @@ Return ONLY valid JSON (no markdown, no emotion label field — the label will b
       setStateRespLoading(false);
     };
 
+    // ── Autonomic layer: involuntary, continuous agent injection ─────────────
+    // When enabled, the agent generates a spontaneous drift in functional state
+    // on a timer and soft-injects it at r≈0 — no button press, the way a mood
+    // moves when nothing is steering it. Reads the field straight from simRef so
+    // it is never stale, and guards against overlapping in-flight calls.
+    const autonomousRead = async () => {
+      const s = simRef.current;
+      if (!s || autoBusyRef.current || !apiKey.trim()) return;
+      autoBusyRef.current = true;
+      try {
+        let rS=0, gS=0, bS=0;
+        for (let i=0; i<s.total; i++) { rS+=s.R[i]; gS+=s.G[i]; bS+=s.B[i]; }
+        const aR=rS/s.total|0, aG=gS/s.total|0, aB=bS/s.total|0;
+        const now = classify(aR, aG, aB).name;
+        const resp = await fetch(API_URL, {
+          method:"POST",
+          headers: apiHeaders(),
+          body: JSON.stringify({
+            model, max_tokens:200, system:SYS_AUTO,
+            messages:[{ role:"user", content:
+              `Current field state: R=${aR}, G=${aG}, B=${aB} (${now}). Produce the next involuntary drift.` }],
+          }),
+        });
+        const data = await resp.json();
+        if (data.error) throw new Error(data.error.message);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const text = data.content?.find(c => c.type==="text")?.text || "";
+        const parsed = parseFirstJson(text);
+        const sr = Math.max(0, Math.min(255, parsed.r|0));
+        const sg = Math.max(0, Math.min(255, parsed.g|0));
+        const sb = Math.max(0, Math.min(255, parsed.b|0));
+        const cl = classify(sr, sg, sb);
+        const enriched = { ...parsed, r:sr, g:sg, b:sb, emotion:cl.name, zone:cl.zone, sig:sr+sg+sb, auto:true };
+        injectCenter(sr, sg, sb, true);  // soft, subtle background injection
+        setApiError(null);
+        setDisp(p => ({...p, selfState: enriched}));
+        setReadings(prev => [{...enriched, ts:new Date().toLocaleTimeString(), q:"(involuntary)"}, ...prev].slice(0,6));
+      } catch(e) {
+        setApiError(`autonomic: ${e.message}`);
+      }
+      autoBusyRef.current = false;
+    };
+    autoFnRef.current = autonomousRead;  // refresh each render so the timer never calls a stale closure
+
+    // The autonomic clock: a 1s tick that counts down and fires on zero.
+    // Pauses while the tab is hidden so it doesn't burn credits in the background.
+    useEffect(() => {
+      if (!autoInject) { setAutoCountdown(0); return; }
+      setAutoCountdown(autoInterval);
+      const id = setInterval(() => {
+        if (typeof document !== "undefined" && document.hidden) return; // pause when hidden
+        setAutoCountdown(prev => {
+          if (prev <= 1) { if (autoFnRef.current) autoFnRef.current(); return autoInterval; }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(id);
+    }, [autoInject, autoInterval]);
+
+    const toggleAuto = () => {
+      if (!autoInject && !apiKey.trim()) {
+        setApiError("Enter your Anthropic API key below — involuntary injection needs the agent.");
+        return;
+      }
+      setApiError(null);
+      setAutoInject(v => !v);
+    };
+
     // ── Click-to-seed ────────────────────────────────────────────────────────
     const handleClick = useCallback((e) => {
       const s = simRef.current; if (!s) return;
@@ -812,6 +928,11 @@ Return ONLY valid JSON (no markdown, no emotion label field — the label will b
               style={{borderRadius:"50%", display:"block", cursor:"crosshair",
                 width:W, maxWidth:"min(92vw, 520px)", height:"auto",
                 boxShadow:`0 0 60px rgba(${avgR},${avgG},${avgB},0.18), 0 0 120px rgba(${avgR},${avgG},${avgB},0.07)`}}/>
+            {!running && (
+              <div style={{textAlign:"center", fontSize:11.5, color:"#c0a7e2", marginTop:8, ...mono}}>
+                paused · paste your API key below, then press ▶ run to begin
+              </div>
+            )}
             <div style={{textAlign:"center", fontSize:11.5, color:"#3c4d68", marginTop:8, ...mono}}>
               click anywhere on the disk to seed · {gen.toLocaleString()} generations
             </div>
@@ -820,7 +941,7 @@ Return ONLY valid JSON (no markdown, no emotion label field — the label will b
                 background:`rgba(${selfState.r},${selfState.g},${selfState.b},0.09)`,
                 border:`1px solid rgba(${selfState.r},${selfState.g},${selfState.b},0.3)`,
                 color:"#7c8fae", letterSpacing:"0.04em"}}>
-                ⊙ injected at r≈0 · {selfState.emotion} · sig {selfState.sig} · {Math.round(selfState.uncertainty*100)}% uncertain
+                {selfState.auto ? "⟳ involuntary" : "⊙ injected"} at r≈0 · {selfState.emotion} · sig {selfState.sig} · {Math.round(selfState.uncertainty*100)}% uncertain
               </div>
             )}
           </div>
@@ -862,6 +983,34 @@ Return ONLY valid JSON (no markdown, no emotion label field — the label will b
                   ask the model to respond to its own reading
                 </span>
               </div>
+
+              {/* Autonomic — involuntary, continuous agent injection */}
+              <div style={{marginTop:9, paddingTop:9, borderTop:"1px solid #16202e"}}>
+                <div style={{display:"flex", alignItems:"center", gap:8, cursor:"pointer"}} onClick={toggleAuto}>
+                  <div style={{width:30, height:16, borderRadius:9, flexShrink:0, transition:"background 0.2s",
+                    background:autoInject?"#3a2d56":"#101a28",
+                    border:`1px solid ${autoInject?"#7a5fb0":"#243245"}`, position:"relative"}}>
+                    <div style={{width:10, height:10, borderRadius:"50%", background:autoInject?"#c9b6ec":"#34465d",
+                      position:"absolute", top:2, left:autoInject?16:3, transition:"left 0.2s"}}/>
+                  </div>
+                  <span style={{fontSize:11.5, color:autoInject?"#c0a7e2":"#54688a", ...mono}}>
+                    ⟳ autonomic — involuntary continuous injection
+                  </span>
+                </div>
+                {autoInject && (
+                  <div style={{marginTop:8}}>
+                    <div style={{fontSize:10.5, color:"#8a78b4", marginBottom:5, ...mono}}>
+                      the agent injects on its own · every {autoInterval}s · next in {autoCountdown}s{autoBusyRef.current ? " · reading…" : ""}
+                    </div>
+                    <input type="range" min={8} max={90} step={1} value={autoInterval}
+                      onChange={e=>setAutoInterval(+e.target.value)} style={{width:"100%"}}/>
+                    <div style={{fontSize:10, color:"#5a4a7a", marginTop:4, lineHeight:1.5, ...mono}}>
+                      spends credits continuously on your key · pauses when this tab is hidden
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {apiError && <div style={{fontSize:11, color:"#dd6a6a", marginTop:8, lineHeight:1.55, ...mono}}>{apiError}</div>}
 
               {selfState && (
@@ -913,7 +1062,9 @@ Return ONLY valid JSON (no markdown, no emotion label field — the label will b
                   <div key={i} style={{marginBottom:9, opacity:Math.max(0.35, 1-i*0.12)}}>
                     <div style={{display:"flex", alignItems:"center", gap:8}}>
                       <div style={{width:11, height:11, borderRadius:"50%", flexShrink:0, background:`rgb(${rd.r},${rd.g},${rd.b})`}}/>
-                      <span style={{fontSize:12.5, color:"#8fa3c0", flex:1, ...mono}}>{rd.emotion}</span>
+                      <span style={{fontSize:12.5, color:"#8fa3c0", flex:1, ...mono}}>
+                        <span style={{color:rd.auto?"#a98fd0":"#4f7bb0"}}>{rd.auto?"⟳":"⊙"}</span> {rd.emotion}
+                      </span>
                       <span style={{fontSize:10.5, color:"#3c4d68", ...mono}}>sig:{rd.sig}</span>
                       <span style={{fontSize:10.5, color:"#33415c", marginLeft:5, ...mono}}>{rd.ts}</span>
                     </div>
