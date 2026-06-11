@@ -163,6 +163,36 @@
 
     .repo-link:hover { background: #1b2838; }
 
+    .demo-link {
+      display: inline-block;
+      background: #2d4a6e;
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .demo-link:hover { background: #3a5b85; transform: translateY(-1px); }
+
+    .demo-cta {
+      text-align: center;
+      margin: 2.5em 0;
+      padding: 24px;
+      background: linear-gradient(135deg, #f0f5ff 0%, #e8f0fb 100%);
+      border: 1px solid #d4e0f0;
+      border-radius: 10px;
+    }
+
+    .demo-cta .cta-note {
+      font-size: 13px;
+      color: #5a6b85;
+      margin-top: 10px;
+      font-family: 'Courier New', monospace;
+    }
+
     .footnote {
       margin-top: 3em;
       padding-top: 2em;
@@ -228,6 +258,11 @@
   <p>
     The answer proposed here is hyperbolic geometry. Not as a metaphor, but as a formal model. HyperbolicMind is a cellular automaton running on a Poincar&eacute; disk &mdash; a visualization of a single continuous emotional field evolving on a Riemannian manifold. It is the micro in the Emotional Economy: not an aggregate, but an interior.
   </p>
+
+  <div class="demo-cta">
+    <a class="demo-link" href="hyperbolicmind_demo.html">&#9654;&nbsp; Launch the interactive demo</a>
+    <div class="cta-note">Runs entirely in your browser &middot; bring your own Anthropic API key for the live AI readout</div>
+  </div>
 
   <h2>Why Hyperbolic Geometry</h2>
 
@@ -362,7 +397,8 @@
     The companion simulation, EmotiveMind, takes this same emotional framework into macro territory &mdash; 500 such interiors, each interacting with the others, producing the aggregate dynamics of an emotional economy. Together they constitute the Emotional Economy: HyperbolicMind at the micro level (one mind, one manifold) and EmotiveMind at the macro level (many minds, one market).
   </p>
 
-  <p>
+  <p style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+    <a class="demo-link" href="hyperbolicmind_demo.html">&#9654;&nbsp; Launch interactive demo</a>
     <a class="repo-link" href="https://github.com/danmm16/Emotional-Economy-Micro-and-Macro" target="_blank">View on GitHub</a>
   </p>
 
